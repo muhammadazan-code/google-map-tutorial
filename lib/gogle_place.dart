@@ -16,12 +16,18 @@ class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
   final _controller = TextEditingController();
 
   String _sessionToken = '1234567890';
+  /* Session token ko use karna optional hai, lekin highly recommended hai, especially agar aap multiple
+  autocomplete requests ya continuous search kar rahe hain. Agar aap sirf ek simple search kar rahe hain aur zyada 
+  complex scenarios nahi hain, to aap bina session token ke bhi kaam chala sakte hain. */
   List<dynamic> _placeList = [];
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(() {
+      /* addListener() method ka use aap TextEditingController ko monitor karne ke liye karte hain, taki jab bhi user text
+      field mein koi change kare, aap us change ko track kar sakein aur uske according actions perform kar sakein. 
+      Ye real-time input validation, search suggestions, or any dynamic behavior ke liye useful hota hai. */
       _onChanged();
     });
   }
