@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_map/current_location.dart';
-import 'package:google_map/custom_marker_info_window.dart';
-import 'package:google_map/custom_marker_screen.dart';
-import 'package:google_map/gogle_place.dart';
+import 'package:google_map/_network_mage_custom_marker.dart';
+import 'package:google_map/polygone.dart';
+import 'package:google_map/polyline.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       home: Scaffold(
-        body: CustomMarkerInfoWindowScreen(),
+        body: NetworkImageCustomMarker(),
       ),
     );
   }
