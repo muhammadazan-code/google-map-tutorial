@@ -1,69 +1,76 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class CurrentLocationScreen extends StatefulWidget {
-  const CurrentLocationScreen({super.key});
+class GetCurrentLocation extends StatefulWidget {
+  const GetCurrentLocation({super.key});
 
   @override
-  State<CurrentLocationScreen> createState() => _CurrentLocationScreenState();
+  State<GetCurrentLocation> createState() => _GetCurrentLocationState();
 }
 
-class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
-  Completer<GoogleMapController> controller1 = Completer();
-  static final CameraPosition _kGooglePlex =
-      CameraPosition(target: LatLng(33.4564, 74.825), zoom: 14);
-  final List<Marker> marker = [];
-  final listoflocation = [
-    Marker(markerId: MarkerId('1'), position: LatLng(33.4564, 74.825)),
+class _GetCurrentLocationState extends State<GetCurrentLocation> {
+  CameraPosition cameraPosition =
+      CameraPosition(target: LatLng(33.6995, 73.0363), zoom: 14.573);
+  List<Marker> listOfMarker = [
+    Marker(
+      markerId: MarkerId('Islamabad, Pakistan'),
+      position: LatLng(33.6995, 73.0363),
+    ),
+    Marker(
+        markerId: MarkerId('Karachi, Pakistan'),
+        position: LatLng(24.8607, 67.0011)),
   ];
-  Future<Position> getUserLocation() async {
-    await Geolocator.requestPermission()
-        .then((value) {})
-        .onError((error, StackTrace) {
-      print("Error" + error.toString());
+  final Completer<GoogleMapController> _controller = Completer();
+  loadData() {
+    getUserLocation().then((value) async {
+      listOfMarker.add(Marker(
+          markerId: MarkerId('Current Location'),
+          position: LatLng(value.latitude, value.longitude),
+          infoWindow: InfoWindow(
+              title: 'My Current Location',
+              snippet: 'Hashim Jokhio, Malir Karachi, Sindh Pakistan')));
+      CameraPosition myCameraPostion = CameraPosition(
+          target: LatLng(value.latitude, value.longitude), zoom: 14);
+      setState(() {});
+      final GoogleMapController gotoCurrentLocation = await _controller.future;
+      gotoCurrentLocation
+          .animateCamera(CameraUpdate.newCameraPosition(myCameraPostion));
     });
-    return await Geolocator.getCurrentPosition();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: null,
       body: GoogleMap(
-        zoomControlsEnabled: false,
-        initialCameraPosition: _kGooglePlex,
         mapType: MapType.hybrid,
-        onMapCreated: (GoogleMapController controller) async {
-          controller1.complete(controller);
+        initialCameraPosition: cameraPosition,
+        zoomControlsEnabled: false,
+        onMapCreated: (GoogleMapController myController) {
+          _controller.complete(myController);
         },
+        markers: Set.of(listOfMarker),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          getUserLocation().then(
-            (value) async {
-              marker.add(Marker(
-                  markerId: MarkerId('10'),
-                  infoWindow: InfoWindow(
-                    title: 'My current Location',
-                  ),
-                  position: LatLng(value.latitude, value.longitude)));
-              final CameraPosition cameraPosition = CameraPosition(
-                target: LatLng(value.latitude, value.longitude),
-                zoom: 14,
-              );
-              GoogleMapController controller = await controller1.future;
-              controller.animateCamera(
-                  CameraUpdate.newCameraPosition(cameraPosition));
-              setState(() {});
-            },
-          );
-        },
-        child: Icon(
-          Icons.local_activity,
-        ),
+        onPressed: () {},
+        child: Icon(Icons.location_on),
       ),
     );
   }
+}
+
+Future<Position> getUserLocation() async {
+  await Geolocator.requestPermission()
+      .then((value) {})
+      .onError((error, StackTrace) {});
+  return await Geolocator.getCurrentPosition();
 }
